@@ -17,11 +17,11 @@ An interactive phishing-awareness trainer built with **SvelteKit + TypeScript** 
 | Framework | SvelteKit (Svelte 5 **runes**) |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 + scoped component styles |
-| Database | SQLite via `better-sqlite3` |
+| Database | SQLite via libSQL — a local file in dev, [Turso](https://turso.tech) in production |
 | ORM | Drizzle ORM + Drizzle Kit (migrations) |
 | Server | SvelteKit `+page.server.ts` loaders, `+server.ts` endpoints |
 | Tests | Playwright (e2e) |
-| Adapter | `@sveltejs/adapter-node` (deploy anywhere Node runs) |
+| Adapter | `@sveltejs/adapter-vercel` |
 
 ## How the data flows
 
@@ -53,15 +53,24 @@ npm run dev          # http://localhost:5173
 | `npm run db:studio` | Open Drizzle Studio |
 | `npm run test:e2e` | Run the Playwright suite |
 
-## Deployment
+## Deployment (Vercel + Turso)
 
-It's a small Node server app (SSR + API + a SQLite file), so it runs anywhere Node does:
+Deploys automatically from this GitHub repo on every push.
 
-1. `npm run build` → `node build` (via `adapter-node`).
-2. Set `DATABASE_URL` to a writable path on a **persistent disk**, then run `npm run db:setup` once.
-3. Put it behind Nginx with a domain (or any Node host / container).
+1. **Create a Turso database** and grab its URL + token:
+   ```bash
+   turso db create phish-dojo
+   turso db show phish-dojo --url            # libsql://…turso.io
+   turso db tokens create phish-dojo         # the auth token
+   ```
+2. **Apply the schema + seed it** (once), pointed at Turso:
+   ```bash
+   DATABASE_URL='libsql://…turso.io' DATABASE_AUTH_TOKEN='…' npm run db:setup
+   ```
+3. **Import the repo on Vercel** and set two environment variables:
+   `DATABASE_URL` and `DATABASE_AUTH_TOKEN`. Vercel detects SvelteKit and builds it.
 
-On serverless platforms (where the disk isn't persistent), swap the Drizzle driver to Postgres (Neon/Supabase) or libSQL (Turso) — the schema and queries barely change.
+Locally there's nothing to configure — `DATABASE_URL` defaults to `file:local.db`.
 
 ## Project layout
 

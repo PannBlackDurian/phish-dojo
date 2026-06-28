@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const cuesTotal = int(body.cuesTotal, 0, 999);
 
-	const row = db
+	const rows = await db
 		.insert(runs)
 		.values({
 			alias,
@@ -37,8 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			rank: String(body.rank ?? 'Aware').slice(0, 32),
 			createdAt: new Date()
 		})
-		.returning()
-		.get();
+		.returning();
 
-	return json({ ok: true, id: row?.id });
+	return json({ ok: true, id: rows[0]?.id });
 };

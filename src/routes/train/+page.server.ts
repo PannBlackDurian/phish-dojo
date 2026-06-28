@@ -6,7 +6,7 @@ import type { TrainingEmail } from '$lib/types';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
-	const rows = db.select().from(scenarios).orderBy(asc(scenarios.orderIndex)).all();
+	const rows = await db.select().from(scenarios).orderBy(asc(scenarios.orderIndex));
 	const deck: TrainingEmail[] = rows.map((r) => r.data);
 	return { deck };
 };

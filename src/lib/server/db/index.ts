@@ -1,15 +1,20 @@
 // =============================================================================
-//  Database client. Lives under `$lib/server`, so SvelteKit guarantees this
-//  (and the native better-sqlite3 module) is never bundled into the browser.
+//  Database client (libSQL / Turso). Lives under `$lib/server`, so SvelteKit
+//  guarantees it is never bundled into the browser.
+//
+//  Locally:  DATABASE_URL=file:local.db        (a plain SQLite file)
+//  In prod:  DATABASE_URL=libsql://<db>.turso.io  + DATABASE_AUTH_TOKEN
+//  One driver, both environments.
 // =============================================================================
 
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
+import { env } from '$env/dynamic/private';
 import * as schema from './schema';
 
-const url = process.env.DATABASE_URL ?? 'local.db';
+const client = createClient({
+	url: env.DATABASE_URL ?? 'file:local.db',
+	authToken: env.DATABASE_AUTH_TOKEN
+});
 
-const sqlite = new Database(url);
-sqlite.pragma('journal_mode = WAL');
-
-export const db = drizzle(sqlite, { schema });
+export const db = drizzle(client, { schema });
