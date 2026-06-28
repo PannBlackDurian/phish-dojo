@@ -2,6 +2,8 @@
 
 An interactive phishing-awareness trainer built with **SvelteKit + TypeScript** on a **SQLite** backend. Work through a simulated inbox, inspect each message like a security analyst, decide *phishing* vs *safe*, and get scored on the exact red flags you caught or missed — plus a global leaderboard and a standalone tool that analyzes any email you paste.
 
+**🔗 Live demo: [phish-dojo.vercel.app](https://phish-dojo.vercel.app)** — deployed on Vercel with a Turso (libSQL) database.
+
 > Phishing is the entry point for the majority of real breaches. The person reading the email is the last line of defense — this trains that instinct.
 
 ## Features
